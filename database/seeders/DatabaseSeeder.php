@@ -17,18 +17,26 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => bcrypt('password'),
-            'role' => 'admin',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin User',
+                'password' => bcrypt('password'),
+                'role' => 'admin',
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Agent User',
-            'email' => 'agent@example.com',
-            'password' => bcrypt('password'),
-            'role' => 'agent',
+        User::updateOrCreate(
+            ['email' => 'agent@example.com'],
+            [
+                'name' => 'Agent User',
+                'password' => bcrypt('password'),
+                'role' => 'agent',
+            ]
+        );
+
+        $this->call([
+            SubscriberSeeder::class,
         ]);
     }
 }

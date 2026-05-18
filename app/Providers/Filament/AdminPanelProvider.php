@@ -26,7 +26,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->path('')
             ->login()
             ->colors([
                 'primary' => Color::Amber,
@@ -38,8 +38,11 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
+                \App\Filament\Widgets\Overview::class,
+                \App\Filament\Widgets\ConsumptionChart::class,
+            ])
+            ->userMenuItems([
+                'logout' => \Filament\Navigation\MenuItem::make()->hidden(),
             ])
             ->middleware([
                 EncryptCookies::class,

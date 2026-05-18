@@ -37,6 +37,10 @@ class ReadingsTable
                     ->label('سعر م3')
                     ->numeric()
                     ->sortable(),
+                TextColumn::make('subscription_fee')
+                    ->label('انخراط')
+                    ->numeric()
+                    ->sortable(),
                 TextColumn::make('total')
                     ->label('المجموع')
                     ->numeric()
@@ -48,7 +52,18 @@ class ReadingsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                \Filament\Tables\Filters\Filter::make('month')
+                    ->form([
+                        \Filament\Forms\Components\TextInput::make('month')
+                            ->label('الشهر')
+                            ->type('month'),
+                    ])
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
+                        return $query->when(
+                            $data['month'],
+                            fn (\Illuminate\Database\Eloquent\Builder $query, $date): \Illuminate\Database\Eloquent\Builder => $query->where('month', \Illuminate\Support\Carbon::parse($date)->format('Y-m')),
+                        );
+                    }),
             ])
             ->recordActions([
                 EditAction::make(),

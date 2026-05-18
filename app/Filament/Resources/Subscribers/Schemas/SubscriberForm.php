@@ -17,20 +17,16 @@ class SubscriberForm
                 TextInput::make('name')
                     ->label('الاسم الكامل')
                     ->required(),
+                TextInput::make('meter_number')
+                    ->label('رقم العداد')
+                    ->required(),
                 TextInput::make('cin')
                     ->label('رقم البطاقة الوطنية')
-                    ->required(),
+                    ->default(null),
                 TextInput::make('phone')
                     ->label('الهاتف')
                     ->tel()
                     ->default(null),
-                Textarea::make('address')
-                    ->label('العنوان')
-                    ->default(null)
-                    ->columnSpanFull(),
-                TextInput::make('meter_number')
-                    ->label('رقم العداد')
-                    ->required(),
                 DatePicker::make('date_subscription')
                     ->label('تاريخ الاشتراك')
                     ->required(),

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('subscribers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('cin')->unique();
+            $table->string('cin')->nullable();
             $table->string('phone')->nullable();
             $table->text('address')->nullable();
             $table->string('meter_number')->unique();

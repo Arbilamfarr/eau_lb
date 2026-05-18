@@ -5,10 +5,11 @@ namespace App\Filament\Resources\Invoices;
 use App\Filament\Resources\Invoices\Pages\ManageInvoices;
 use App\Models\Invoice;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
@@ -101,9 +102,37 @@ class InvoiceResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                \Filament\Tables\Filters\Filter::make('month')
+                    ->form([
+                        \Filament\Forms\Components\TextInput::make('month')
+                            ->label('الشهر')
+                            ->type('month'),
+                    ])
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
+                        return $query->when(
+                            $data['month'],
+                            fn (\Illuminate\Database\Eloquent\Builder $query, $date): \Illuminate\Database\Eloquent\Builder => $query->whereHas('reading', fn ($q) => $q->where('month', \Illuminate\Support\Carbon::parse($date)->format('Y-m'))),
+                        );
+                    }),
             ])
             ->recordActions([
+                Action::make('print')
+                    ->label('طبع')
+                    ->icon('heroicon-o-printer')
+                    ->url(fn (Invoice $record): string => route('invoice.print', $record))
+                    ->openUrlInNewTab(),
+                Action::make('sms')
+                    ->label('رسالة SMS')
+                    ->icon('heroicon-o-chat-bubble-left')
+                    ->color('info')
+                    ->url(fn (Invoice $record): string => "sms:" . ($record->subscriber->phone ?? "") . "?body=" . urlencode("مرحباً " . $record->subscriber->name . "، فاتورتكم لشهر " . $record->reading->month . " جاهزة بمبلغ " . $record->total . " درهم."))
+                    ->openUrlInNewTab(),
+                Action::make('whatsapp')
+                    ->label('WhatsApp')
+                    ->icon('heroicon-o-chat-bubble-bottom-center-text')
+                    ->color('success')
+                    ->url(fn (Invoice $record): string => "https://wa.me/" . preg_replace('/[^0-9]/', '', $record->subscriber->phone ?? "") . "?text=" . urlencode("مرحباً " . $record->subscriber->name . "، فاتورتكم لشهر " . $record->reading->month . " جاهزة بمبلغ " . $record->total . " درهم."))
+                    ->openUrlInNewTab(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
